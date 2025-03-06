@@ -1,13 +1,19 @@
-const express = require("express");
+// Importar las dependencias
+const express = require('express');
 const app = express();
+const port = process.env.PORT || 3000;  // Usar el puerto proporcionado por Heroku si está disponible
 
-app.get("/", (req, res) => {
-  res.send("¡Servidor funcionando! 🚀");
+// Ruta principal
+app.get('/', (req, res) => {
+  res.send('¡La API está funcionando en Heroku!');
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-}).on("error", (err) => {
-  console.error("Error al iniciar el servidor:", err);
+// Ruta adicional de prueba
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test exitoso en Heroku' });
+});
+
+// Iniciar el servidor
+app.listen(port, () => {
+  console.log(`Servidor corriendo en el puerto ${port}`);
 });
