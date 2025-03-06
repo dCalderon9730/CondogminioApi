@@ -1,7 +1,7 @@
 // Importar las dependencias
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;  // Usar el puerto proporcionado por Heroku si está disponible
+const port = process.env.PORT || 3000;  // Usar el puerto asignado por Heroku o el 3000 como fallback
 
 // Ruta principal
 app.get('/', (req, res) => {
