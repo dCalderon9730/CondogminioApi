@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Ruta principal
 app.get('/', (req, res) => {
-  res.send('¡La API está funcionando en Heroku!');
+  res.send('¡La API está funcionando en Heroku y en Firebase!');
 });
 
 // Ruta adicional de prueba
