@@ -1,6 +1,6 @@
 // Importar las dependencias
 const express = require('express');
-const db = require("../firebaseFiles/firebase"); // Importa la configuración de Firebase
+const db = require("./firebaseFiles/firebase"); // Importa la configuración de Firebase
 
 // Crear una instancia de Express y definir el puerto
 const app = express();
