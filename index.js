@@ -1,4 +1,5 @@
 // Importar las dependencias
+require('dotenv').config();  // Cargar las variables de entorno desde el archivo .env
 const express = require('express');
 const db = require("./firebaseFiles/firebase"); // Importa la configuración de Firebase
 
@@ -44,4 +45,5 @@ app.post('/addData', async (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
 });
+
 
