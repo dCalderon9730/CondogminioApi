@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 
 // Ruta adicional de prueba
 router.get('/test', (req, res) => {
-  res.json({ message: 'Test exitoso en Heroku' });
+  res.json({ message: 'Test exitoso en Heroku' }); // -------------------esta está sobrando...
 });
 
 // Ruta para agregar un documento a Firebase

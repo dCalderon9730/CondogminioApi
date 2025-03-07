@@ -20,4 +20,6 @@ admin.initializeApp({
   databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
 });
 
-module.exports = admin.firestore(); // O el servicio que estés usando
+// Exportar admin directamente para usar auth
+module.exports = admin;
+
