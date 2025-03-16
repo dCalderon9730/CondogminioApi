@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 //  Ruta para agregar un usuario a Firebase
 router.post('/addUser', async (req, res) => {
-  const { nombre, celular, correo, contrasena } = req.body;
+  const { nombre, celular, correo, contrasena, idCondominio, nombreCondominio } = req.body;
 
   if (!nombre || !celular || !correo || !contrasena) {
     return res.status(400).send("Faltan parámetros: 'nombre', 'celular', 'correo' y 'contrasena' son obligatorios.");
@@ -23,22 +23,32 @@ router.post('/addUser', async (req, res) => {
   try {
     const snapshot = await db.collection('usuarios').where('correo', '==', correo).get();
     if (!snapshot.empty) {
-      return res.status(400).send({ error: "El correo ya está registrado" });
+        return res.status(400).send({ error: "El correo ya está registrado" });
     }
 
     const hashedPassword = await bcrypt.hash(contrasena, 10);
     const docRef = await db.collection('usuarios').add({
-      nombre,
-      celular,
-      correo,
-      contrasena: hashedPassword
+        nombre,
+        celular,
+        correo,
+        contrasena: hashedPassword,
+        fotografia: "",  // Campo vacío
+        pais: "",        // Campo vacío
+        nacimiento: "",  // Campo vacío
+        status: "pendiente",
+    });
+
+    // Crear la subcolección "condominios" usando el ID del usuario como ID del condominio
+    await db.collection('usuarios').doc(docRef.id).collection('condominios').doc(docRef.id).set({
+        id: idCondominio,
+        nombre: nombreCondominio,
     });
 
     res.status(200).send({ message: "Usuario agregado", id: docRef.id });
-  } catch (error) {
-    console.error("Error al agregar el usuario:", error);
-    res.status(500).send({ error: "Error al agregar el usuario", message: error.message });
-  }
+} catch (error) {
+    console.error("Error al agregar usuario:", error);
+    res.status(500).send({ error: "Error al agregar el usuario" });
+}
 });
 
 
