@@ -10,6 +10,41 @@ router.get('/', (req, res) => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////rutas Post///////////////////////////////////////////////////////////////////////////////////////
+// Ruta sign in
+router.post('/signIn', async (req, res) => {
+  const { correo, contrasena } = req.body;
+
+  if (!correo || !contrasena) {
+    return res.status(400).json({ error: "Correo y contraseña son obligatorios." });
+  }
+
+  try {
+    const snapshot = await db.collection('usuarios').where('correo', '==', correo).get();
+    if (snapshot.empty) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+
+    const user = snapshot.docs[0].data();
+    const isValidPassword = await bcrypt.compare(contrasena, user.contrasena);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: "Contraseña incorrecta." });
+    }
+
+    // Generar token JWT
+    const token = jwt.sign(
+      { id: snapshot.docs[0].id, correo: user.correo, nombre: user.nombre },
+      "secreto_super_seguro",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ message: "Inicio de sesión exitoso", token });
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
 // Ruta para agregar un usuario
 router.post('/addUser', async (req, res) => {
   const { nombre, cedula, correo, contrasena, idCondominios, fotografia, pais, nacimiento } = req.body;
