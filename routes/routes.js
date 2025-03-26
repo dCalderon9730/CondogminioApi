@@ -10,7 +10,6 @@ router.get('/', (req, res) => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////rutas Post///////////////////////////////////////////////////////////////////////////////////////
-// Ruta sign in
 router.post('/signIn', async (req, res) => {
   const { correo, contrasena } = req.body;
 
@@ -24,7 +23,10 @@ router.post('/signIn', async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado." });
     }
 
-    const user = snapshot.docs[0].data();
+    const userDoc = snapshot.docs[0];
+    const user = userDoc.data();
+    const userId = userDoc.id;
+
     const isValidPassword = await bcrypt.compare(contrasena, user.contrasena);
 
     if (!isValidPassword) {
@@ -33,17 +35,18 @@ router.post('/signIn', async (req, res) => {
 
     // Generar token JWT
     const token = jwt.sign(
-      { id: snapshot.docs[0].id, correo: user.correo, nombre: user.nombre },
+      { id: userId, correo: user.correo, nombre: user.nombre },
       "secreto_super_seguro",
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ message: "Inicio de sesión exitoso", token });
+    res.status(200).json({ message: "Inicio de sesión exitoso", token, userId });
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
+
 
 // Ruta para agregar un usuario
 router.post('/addUser', async (req, res) => {
