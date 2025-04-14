@@ -199,6 +199,20 @@ router.post('/checkUser', async (req, res) => {
     res.status(500).send({ error: "Error al verificar el usuario", message: error.message });
   }
 });
+//Obtener un usuario por ID
+router.get('/getUserById/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const doc = await db.collection('usuarios').doc(id).get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.status(200).json({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener el usuario", message: error.message });
+  }
+});
 
 // Ruta para obtener todos los usuarios
 router.get('/getUsers', async (req, res) => {
@@ -232,24 +246,32 @@ router.get('/getPets', async (req, res) => {
     res.status(500).send({ error: "Error al obtener las mascotas", message: error.message });
   }
 });
+// obtener mascota por ID
+router.get('/getPetsByUserId/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const snapshot = await db.collection('mascotas').where('propietario', '==', id).get();
+    const pets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    res.status(200).json(pets);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener las mascotas del usuario", message: error.message });
+  }
+});
+
 
 // Ruta para obtener los recorridos de un usuario si está registrado
-router.post('/getUserRecorridos', async (req, res) => {
-  const { correo } = req.body;
-  if (!correo) {
-    return res.status(400).send("El campo 'correo' es obligatorio.");
-  }
+router.get('/getRecorridosByUserId/:id', async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const snapshot = await db.collection('usuarios').where('correo', '==', correo).get();
-    if (snapshot.empty) {
-      return res.status(404).send({ message: "Usuario no registrado, por favor regístrese." });
-    }
-    const userId = snapshot.docs[0].id;
-    const recorridosSnapshot = await db.collection('recorridos').where('usuarioId', '==', userId).get();
-    const recorridos = recorridosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const snapshot = await db.collection('recorridos').where('idUsuario', '==', id).get();
+    const recorridos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
     res.status(200).json(recorridos);
   } catch (error) {
-    res.status(500).send({ error: "Error al obtener los recorridos", message: error.message });
+    res.status(500).json({ error: "Error al obtener los recorridos del usuario", message: error.message });
   }
 });
 
